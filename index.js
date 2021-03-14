@@ -30,14 +30,34 @@ function preventFormSubmit() {
 function activateInput() {
     //Aqui inserimos no nosso vetor GlobalNames, o evento;
     function insertName(newName) {
-        globalNames.push(newName);
+            globalNames.push(newName);
 
         render();
     }
 
     //Atualiza o Name;
     function updateName(newName) {
-        globalNames[currentIndex] = newName;
+        let name = globalNames[currentIndex];
+        Swal.fire({
+            title: 'Você tem certeza???',
+            text: `O nome ${name} será editado!`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sim, deletar!',
+            cancelButtonText: 'Cancelar'
+          }).then((result) => {
+            if (result.isConfirmed) {
+                 globalNames[currentIndex] = newName;
+                render();
+              Swal.fire(
+                'Sucesso!',
+                `O ${name} foi editado, o novo nome agora é ${newName} !!!`,
+                'success'
+              )
+            }
+          })  
     }
 
     //Pegamos o evento do teclado (Enter) e inserimos no vetor acima;
@@ -53,8 +73,8 @@ function activateInput() {
             isEditing = false;
         }
     }
-    render()
-
+    render();
+  
     //Pegando o evento do teclado
     inputName.addEventListener('keyup', handleTyping)
     inputName.focus();
@@ -66,9 +86,29 @@ function render() {
     //Criamos a função para deletar o button;
     function createDeleteButton(index) {
         function deleteName(){
-            //O splice remove o elemento do array e se necessário, coloca um novo elemento no lugar;
-            globalNames.splice(index, 1);
-            render();
+            let name = globalNames[index];
+            Swal.fire({
+                title: 'Você tem certeza???',
+                text: `O nome ${name} será excluído!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sim, deletar!',
+                cancelButtonText: 'Cancelar'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    //Ao clicar no botão deletar dentro do sweet alert, ele irá chamar o splice e removerá o item do nosso array;
+                     //O splice remove o elemento do array e se necessário, coloca um novo elemento no lugar;    
+                    globalNames.splice(index, 1);
+                    render();
+                  Swal.fire(
+                    'Sucesso!',
+                    `O nome "${name}" foi Excluído!!! `,
+                    'success'
+                  )
+                }
+              })  
         }
 
         var button = document.createElement('button');
@@ -81,11 +121,12 @@ function render() {
     }
 
     //Criamos um SPAN onde inserimos uma classe e nela podemos editar;
-    function createSpan(name) {
+    function createSpan(name, index) {
         function editItem() {
             inputName.value = name;
             inputName.focus();
             isEditing = true;
+            currentIndex = index;
         }
         var span = document.createElement('span');
         span.classList.add('clickable');
@@ -94,6 +135,7 @@ function render() {
 
         return span;
     }
+
     //Aqui limpamos o nosso vetor e adicionamos o valor que foi colocado no input
     divNames.innerHTML = '';
 
@@ -107,7 +149,7 @@ function render() {
         var li = document.createElement('li');
         var button = createDeleteButton(i);
 
-        var span = createSpan(currentName);
+        var span = createSpan(currentName, i);
 
         li.appendChild(button);
         li.appendChild(span);
